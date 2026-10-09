@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Overview{% endblock %}{% block breadcrumb %}Overview{% endblock %}
+{% block content %}
+<section class="page-heading heading-with-action">
+  <div><div class="eyebrow">SATURDAY, {{ today|upper }}</div><h1>Good morning, Anita <span class="wave">✳</span></h1><p class="page-subtitle">Here’s what’s happening across your IT service desk today.</p></div>
+  <div class="heading-actions"><a class="button button-quiet" href="{{ url_for('reports') }}"><span class="button-icon">↗</span> View reports</a><a class="button button-primary" href="{{ url_for('ticket_new') }}"><span class="button-icon">＋</span> Create ticket</a></div>
+</section>
+
+<section class="metric-grid" aria-label="Key metrics">
+  <article class="metric-card metric-indigo"><div class="metric-top"><span class="metric-label">Open tickets</span><span class="metric-icon">◫</span></div><div class="metric-value">{{ totals.open_tickets or 0 }}</div><div class="metric-foot"><span class="metric-note">Across all priorities</span><span class="trend trend-neutral">Live</span></div><div class="metric-spark spark-indigo"><i style="height:33%"></i><i style="height:54%"></i><i style="height:46%"></i><i style="height:70%"></i><i style="height:58%"></i><i style="height:85%"></i><i style="height:68%"></i><i style="height:100%"></i><i style="height:72%"></i><i style="height:89%"></i></div></article>
+  <article class="metric-card metric-orange"><div class="metric-top"><span class="metric-label">Urgent attention</span><span class="metric-icon">⌁</span></div><div class="metric-value">{{ totals.urgent_tickets or 0 }}</div><div class="metric-foot"><span class="metric-note">Critical + high priority</span><span class="trend trend-warning">Priority queue</span></div><div class="metric-spark spark-orange"><i style="height:45%"></i><i style="height:61%"></i><i style="height:38%"></i><i style="height:79%"></i><i style="height:55%"></i><i style="height:95%"></i><i style="height:69%"></i><i style="height:74%"></i><i style="height:90%"></i><i style="height:82%"></i></div></article>
+  <article class="metric-card metric-green"><div class="metric-top"><span class="metric-label">Assets tracked</span><span class="metric-icon">▣</span></div><div class="metric-value">{{ asset_stats.total_assets or 0 }}</div><div class="metric-foot"><span class="metric-note">{{ asset_stats.in_repair or 0 }} currently in repair</span><span class="trend trend-good">Inventory</span></div><div class="metric-spark spark-green"><i style="height:40%"></i><i style="height:46%"></i><i style="height:48%"></i><i style="height:56%"></i><i style="height:51%"></i><i style="height:71%"></i><i style="height:66%"></i><i style="height:81%"></i><i style="height:79%"></i><i style="height:100%"></i></div></article>
+  <article class="metric-card metric-rose"><div class="metric-top"><span class="metric-label">Warranty watch</span><span class="metric-icon">◷</span></div><div class="metric-value">{{ expiring }}</div><div class="metric-foot"><span class="metric-note">Expiring in the next 30 days</span><span class="trend {% if expiring %}trend-warning{% else %}trend-good{% endif %}">{% if expiring %}Review needed{% else %}All clear{% endif %}</span></div><div class="metric-spark spark-rose"><i style="height:60%"></i><i style="height:44%"></i><i style="height:52%"></i><i style="height:65%"></i><i style="height:40%"></i><i style="height:73%"></i><i style="height:54%"></i><i style="height:87%"></i><i style="height:62%"></i><i style="height:79%"></i></div></article>
+</section>
+
+<section class="dashboard-grid">
+  <article class="panel panel-wide">
+    <div class="panel-header"><div><h2>Ticket activity</h2><p>Recent requests requiring visibility</p></div><a class="text-link" href="{{ url_for('tickets') }}">All tickets <span>→</span></a></div>
+    <div class="table-scroll"><table class="data-table"><thead><tr><th>Ticket</th><th>Requester</th><th>Priority</th><th>Status</th><th>Assigned to</th></tr></thead><tbody>
+      {% for t in recent_tickets %}<tr><td><a class="ticket-link" href="{{ url_for('ticket_detail', ticket_id=t.ticket_id) }}"><strong>{{ t.ticket_number }}</strong><span>{{ t.title }}</span></a></td><td><span class="person-cell"><span class="avatar avatar-{{ loop.cycle('blue','violet','mint','amber') }}">{{ t.requester_name[:1] }}</span>{{ t.requester_name }}</span></td><td><span class="priority priority-{{ t.priority_name|lower }}"><i></i>{{ t.priority_name }}</span></td><td><span class="status status-{{ t.status|lower|replace(' ','-') }}">{{ t.status }}</span></td><td class="muted-cell">{{ t.assignee_name or 'Unassigned' }}</td></tr>
+      {% else %}<tr><td colspan="5" class="empty-cell">No tickets found. Create your first ticket to begin.</td></tr>{% endfor %}
+    </tbody></table></div>
+    <div class="panel-footer"><span>Showing {{ recent_tickets|length }} latest requests</span><span class="live-pulse"><i></i> Data refreshed on page load</span></div>
+  </article>
+  <article class="panel category-panel"><div class="panel-header"><div><h2>Request categories</h2><p>Volume by service area</p></div><span class="panel-menu">•••</span></div>
+    <div class="category-list">{% for c in categories %}<div class="category-item"><div class="category-meta"><span>{{ c.category_name }}</span><strong>{{ c.total }}</strong></div><div class="bar-track"><span style="width:{{ (c.total / all_categories * 100)|round|int }}%;"></span></div></div>{% endfor %}</div>
+    <div class="category-bottom"><div class="category-total"><strong>{{ totals.total_tickets or 0 }}</strong><span>total tickets</span></div><div class="category-total"><strong>{{ totals.resolved_tickets or 0 }}</strong><span>resolved tickets</span></div></div>
+  </article>
+</section>
+
+<section class="dashboard-grid lower-grid">
+  <article class="panel"><div class="panel-header"><div><h2>Technician workload</h2><p>Active assignments by technician</p></div><a class="text-link" href="{{ url_for('technicians') }}">Team details <span>→</span></a></div>
+    <div class="workload-list">{% for tech in workload %}<div class="workload-row"><div class="avatar avatar-{{ loop.cycle('violet','blue','mint','amber') }}">{{ tech.full_name.split(' ')[0][:1] }}{{ tech.full_name.split(' ')[-1][:1] }}</div><div class="workload-person"><strong>{{ tech.full_name }}</strong><small>{{ tech.specialization }}</small><div class="workload-track"><span style="width:{{ [tech.active_count * 23, 100]|min }}%"></span></div></div><div class="workload-count"><strong>{{ tech.active_count or 0 }}</strong><small>active</small></div></div>{% endfor %}</div>
+  </article>
+  <article class="panel attention-panel"><div class="panel-header"><div><h2>Needs attention</h2><p>Items to follow up on</p></div><span class="attention-icon">!</span></div>
+    <a class="attention-item" href="{{ url_for('reports') }}"><span class="attention-symbol attention-red">◷</span><span><strong>{{ breached }} SLA items overdue</strong><small>Review ticket ageing and response targets</small></span><span class="attention-arrow">↗</span></a>
+    <a class="attention-item" href="{{ url_for('reports') }}#warranty"><span class="attention-symbol attention-amber">▣</span><span><strong>{{ expiring }} warranties expiring soon</strong><small>Plan repair coverage or renewal</small></span><span class="attention-arrow">↗</span></a>
+    <a class="attention-item" href="{{ url_for('assets', status='In Repair') }}"><span class="attention-symbol attention-blue">⌁</span><span><strong>{{ asset_stats.in_repair or 0 }} assets in repair</strong><small>Track maintenance and return to service</small></span><span class="attention-arrow">↗</span></a>
+  </article>
+</section>
+{% endblock %}

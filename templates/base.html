@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>{% block title %}Overview{% endblock %} · Helix IT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="{{ url_for('dashboard') }}" aria-label="Helix IT home">
+        <span class="brand-mark"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3.5 34.2 11.7v16.6L20 36.5 5.8 28.3V11.7L20 3.5Z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 23.5 18 12l4.3 9 5.7-4.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="28" cy="16.5" r="2.2" fill="currentColor"/></svg></span>
+        <span class="brand-copy"><strong>helix<span>IT</span></strong><small>Service operations</small></span>
+      </a>
+      <div class="workspace-switcher"><span class="workspace-icon">W</span><span><strong>Woxsen University</strong><small>IT workspace</small></span><span class="chevron">⌄</span></div>
+      <div class="nav-section-label">WORKSPACE</div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <a class="nav-link {% if active_endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span class="nav-icon">▦</span><span>Overview</span></a>
+        <a class="nav-link {% if active_endpoint in ['tickets','ticket_new','ticket_detail'] %}active{% endif %}" href="{{ url_for('tickets') }}"><span class="nav-icon">◫</span><span>Tickets</span><span class="nav-count">{{ open_ticket_count }}</span></a>
+        <a class="nav-link {% if active_endpoint in ['assets','asset_new','asset_detail','asset_edit'] %}active{% endif %}" href="{{ url_for('assets') }}"><span class="nav-icon">▣</span><span>Asset inventory</span></a>
+        <a class="nav-link {% if active_endpoint == 'technicians' %}active{% endif %}" href="{{ url_for('technicians') }}"><span class="nav-icon">♧</span><span>Technicians</span></a>
+        <a class="nav-link {% if active_endpoint in ['maintenance','maintenance_status'] %}active{% endif %}" href="{{ url_for('maintenance') }}"><span class="nav-icon">⌁</span><span>Maintenance</span></a>
+      </nav>
+      <div class="nav-section-label nav-section-spaced">INSIGHTS</div>
+      <nav class="nav-list" aria-label="Reports navigation">
+        <a class="nav-link {% if active_endpoint in ['reports','export_reports'] %}active{% endif %}" href="{{ url_for('reports') }}"><span class="nav-icon">▤</span><span>Reports & analytics</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="status-panel"><span class="status-dot"></span><div><strong>System operational</strong><small>Database connected</small></div><span class="status-check">✓</span></div>
+        <div class="user-profile"><div class="avatar avatar-violet">AR</div><div class="user-copy"><strong>Anita Rao</strong><small>IT administrator · Demo</small></div><span class="more-dots">•••</span></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobile-menu" aria-label="Toggle navigation">☰</button>
+        <div class="breadcrumb"><span>Workspace</span><span class="crumb-sep">/</span><strong>{% block breadcrumb %}Overview{% endblock %}</strong></div>
+        <div class="topbar-actions">
+          <form class="global-search" action="{{ url_for('global_search') }}" method="get"><span class="search-symbol">⌕</span><input type="search" name="q" placeholder="Search tickets, assets…" aria-label="Search tickets and assets" value="{{ request.args.get('q','') if active_endpoint == 'global_search' else '' }}"><kbd>↵</kbd></form>
+          <button class="icon-button" type="button" title="Notifications" aria-label="Notifications"><span class="bell-icon">♧</span><i></i></button>
+          <div class="topbar-divider"></div><span class="date-chip">{{ today }}</span>
+        </div>
+      </header>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}<div class="flash-stack">{% for category, message in messages %}<div class="flash flash-{{ category }}"><span>{% if category == 'success' %}✓{% else %}!{% endif %}</span><p>{{ message }}</p><button type="button" class="flash-close" aria-label="Dismiss">×</button></div>{% endfor %}</div>{% endif %}
+      {% endwith %}
+
+      <div class="page-content">
+        {% block content %}{% endblock %}
+      </div>
+      <footer class="app-footer"><span>Helix IT · IT Helpdesk & Asset Support Management</span><span>Academic prototype · Local demo data</span></footer>
+    </main>
+  </div>
+</body>
+</html>

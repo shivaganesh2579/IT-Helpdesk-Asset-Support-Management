@@ -1,0 +1,125 @@
+erDiagram
+    DEPARTMENTS ||--o{ USERS : contains
+    DEPARTMENTS ||--o{ ASSETS : owns
+    ASSET_CATEGORIES ||--o{ ASSETS : categorizes
+    USERS o|--o{ ASSETS : assigned_to
+    ASSETS ||--o{ WARRANTIES : covered_by
+    USERS ||--o{ TICKETS : requests
+    ASSETS o|--o{ TICKETS : relates_to
+    TICKET_CATEGORIES ||--o{ TICKETS : classifies
+    PRIORITIES ||--o{ TICKETS : prioritizes
+    TICKETS ||--o| INCIDENTS : specializes_as
+    TICKETS ||--o| SERVICE_REQUESTS : specializes_as
+    USERS ||--o| SUPPORT_STAFF : has_profile
+    TICKETS ||--o{ TICKET_ASSIGNMENTS : assignment_history
+    SUPPORT_STAFF ||--o{ TICKET_ASSIGNMENTS : assigned_to
+    USERS ||--o{ TICKET_ASSIGNMENTS : assigned_by
+    TICKETS ||--o{ TICKET_STATUS_HISTORY : status_events
+    USERS ||--o{ TICKET_STATUS_HISTORY : changed_by
+    TICKETS ||--o| RESOLUTIONS : resolved_with
+    SUPPORT_STAFF ||--o{ RESOLUTIONS : resolves
+    ASSETS ||--o{ MAINTENANCE_RECORDS : maintained_by_record
+    SUPPORT_STAFF o|--o{ MAINTENANCE_RECORDS : performs
+
+    DEPARTMENTS {
+        int department_id PK
+        string department_name UK
+        string location
+    }
+    USERS {
+        int user_id PK
+        string employee_code UK
+        string full_name
+        string email UK
+        int department_id FK
+        string role
+    }
+    ASSET_CATEGORIES {
+        int asset_category_id PK
+        string category_name UK
+    }
+    ASSETS {
+        int asset_id PK
+        string asset_tag UK
+        string asset_name
+        int asset_category_id FK
+        int department_id FK
+        int assigned_user_id FK
+        string model_number
+        string asset_status
+    }
+    WARRANTIES {
+        int warranty_id PK
+        int asset_id FK
+        string provider
+        date warranty_start
+        date warranty_end
+    }
+    TICKET_CATEGORIES {
+        int ticket_category_id PK
+        string category_name UK
+    }
+    PRIORITIES {
+        int priority_id PK
+        string priority_name UK
+        int sla_hours
+    }
+    TICKETS {
+        int ticket_id PK
+        string ticket_number UK
+        string ticket_type
+        int requester_id FK
+        int asset_id FK
+        int ticket_category_id FK
+        int priority_id FK
+        string status
+        datetime created_at
+    }
+    INCIDENTS {
+        int ticket_id PK,FK
+        string impact
+        string urgency
+    }
+    SERVICE_REQUESTS {
+        int ticket_id PK,FK
+        string request_type
+        string approval_status
+    }
+    SUPPORT_STAFF {
+        int staff_id PK
+        int user_id FK,UK
+        string staff_code UK
+        string specialization
+    }
+    TICKET_ASSIGNMENTS {
+        int assignment_id PK
+        int ticket_id FK
+        int staff_id FK
+        int assigned_by FK
+        datetime assigned_at
+        datetime unassigned_at
+    }
+    TICKET_STATUS_HISTORY {
+        int history_id PK
+        int ticket_id FK
+        int changed_by FK
+        string old_status
+        string new_status
+        datetime changed_at
+    }
+    RESOLUTIONS {
+        int resolution_id PK
+        int ticket_id FK,UK
+        int resolved_by FK
+        string resolution_text
+        datetime resolved_at
+    }
+    MAINTENANCE_RECORDS {
+        int maintenance_id PK
+        int asset_id FK
+        int performed_by FK
+        date scheduled_date
+        date completed_date
+        string status
+        decimal cost
+    }

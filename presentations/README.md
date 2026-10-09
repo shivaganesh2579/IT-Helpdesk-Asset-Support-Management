@@ -1,9 +1,9 @@
-# Review presentations — pending after prototype validation
+# Review presentations — Project 39
 
-The coursework submission requires three separate presentations. Keep the filenames stable so the repository is easy for the faculty to review.
+Three phase-specific PowerPoint decks are included:
 
-1. `Phase_1_Problem_Scope_ERD.pptx` — problem identification, scope/objectives, users and functional requirements, conceptual ERD and initial relational schema (Review 1).
-2. `Phase_2_3NF_SQL_Queries.pptx` — final 3NF design, functional dependencies, data dictionary, integrity constraints, sample data and SQL report demonstrations (Review 2).
-3. `Phase_3_Application_Demo.pptx` — final architecture, database connectivity, CRUD/validation, report screens, test results, limitations and future scope (Review 3).
+1. `Phase_1_Problem_Scope_ERD.pptx` — Review 1: problem, objectives, scope, user roles, functional requirements, conceptual ER model and initial relational-schema groups.
+2. `Phase_2_3NF_SQL_Queries.pptx` — Review 2: actual SQLite schema, relation groups, functional dependencies, 1NF–3NF rationale, integrity constraints and representative SQL reports.
+3. `Phase_3_Application_Demo.pptx` — Final review: application architecture, captured prototype screens, ticket lifecycle, assets, maintenance, analytics, CSV export, observed manual evidence, tests included and future scope.
 
-These files are intentionally not faked or replaced with placeholder slides. Add the real PowerPoint decks after the corresponding design and prototype behaviours have been checked. The final ER diagram and table names should match `../docs/ER_DIAGRAM.mmd` and `../sql/schema_sqlite.sql`.
+The current prototype is Flask + SQLite. `sql/mysql_schema.sql` is a MySQL 8 reference/migration artefact; the running app is SQLite-backed. Demo names and records are synthetic. Automated tests are included in `tests/test_app.py`; run `python -m unittest discover -s tests -v` and record the actual outcome before final submission.
